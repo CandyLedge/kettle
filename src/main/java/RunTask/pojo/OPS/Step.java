@@ -1,4 +1,4 @@
-package RunTask.pojo.ABC;
+package RunTask.pojo.OPS;
 
 public  class Step {
     protected Integer step;

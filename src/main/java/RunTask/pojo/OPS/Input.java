@@ -1,4 +1,4 @@
-package RunTask.pojo.ABC;
+package RunTask.pojo.OPS;
 
 public class Input {
     // 这里封装了输入的操作 都是静态方法，因为要打包出去重复使用

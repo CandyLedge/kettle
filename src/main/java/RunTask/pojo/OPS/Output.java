@@ -1,4 +1,4 @@
-package RunTask.pojo.ABC;
+package RunTask.pojo.OPS;
 
 public class Output {
     // 这里封装了输出的操作 例如：数据库，文件···
