@@ -54,7 +54,7 @@ public class Running {
                                    .split("-")[1];
             switch (mode){
                 case "where_data_by_column":
-                    Middle.middle_whereDataByColumn(step.getPrivateField(), output);
+                    Middle.middle_whereDataByColumn(step.getPrivateField(), output, result);
                     break;
                 default:
                     throw new RuntimeException("有没处理的middle！");
