@@ -1,8 +1,11 @@
 package RunTask.pojo.OPS;
 
+import java.util.HashMap;
+import java.util.List;
+
 public class Output {
     // 这里封装了输出的操作 例如：数据库，文件···
-    public static void output_database(String cmd){
+    public static void output_database(String cmd, List<HashMap<String, String>> result){
     
     }
 }
