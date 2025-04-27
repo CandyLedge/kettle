@@ -12,7 +12,7 @@ public class OPS_Test {
     @Test
     public void test01(){
         List<Step> outputs = new ArrayList<>();
-        outputs.add(new Step(2,"","output-database","database man man01"));
+        outputs.add(new Step(2,"","output-database","database woman man01"));
         outputs.add(new Step(3,"","output-database","database woman woman01"));
         List<HashMap<String,String>> result = new ArrayList<>();
         HashMap<String,String> man1 = new HashMap<>();
