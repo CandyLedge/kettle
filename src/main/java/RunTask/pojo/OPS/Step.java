@@ -3,7 +3,7 @@ package RunTask.pojo.OPS;
 public  class Step {
     protected Integer step;
     protected String description;
-    protected String type;
+    protected String type;//大类-子模式
     protected String privateField;
     
     public String getPrivateField() {
