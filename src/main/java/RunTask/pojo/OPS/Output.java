@@ -10,17 +10,24 @@ public class Output {
     public static void output_database(String cmd, HashMap<String, String> result){
         String dbName = cmd.split(" ")[1];
         String tbName = cmd.split(" ")[2];
+        String jsonStr = getJsonStr(result, tbName);
+        System.out.println("jsonStr = " + jsonStr);
+    }
+    
+    private static String getJsonStr(HashMap<String, String> result, String tbName) {
+        // 传入一个Map,将map转为insert into语句
         StringBuffer sql = new StringBuffer("insert into ");
         sql.append(tbName).append("(");
-        String column = String.join(", ",result.keySet());
+        String column = String.join(", ", result.keySet());
         sql.append(column).append(") values (");
         String values = String.join(", ", result.values());
         sql.append(values).append(");");
         SqlJson json = new SqlJson();
         json.setSql(sql.toString());
         String jsonStr = JSONUtil.toJsonStr(json);
-        System.out.println("jsonStr = " + jsonStr);
+        return jsonStr;
     }
+    
     private static class SqlJson{
         private String sql;
         private List<Object> params;
