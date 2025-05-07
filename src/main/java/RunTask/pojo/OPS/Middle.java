@@ -30,7 +30,14 @@ public class Middle {
             String value = row.get(field);
             String goToStep = switchCase.get(value);
             Step step = indexToStepMap.get(goToStep);
-            Output.output_database(step.getPrivateField(), row);
+            switch (step.getType()) {
+                case "output-database":
+                    Output.output_database(step.getPrivateField(), row);
+                    break;
+                default:
+                    throw new RuntimeException("出现了未知的输出类型！");
+            }
+
         }
     }
     
