@@ -1,4 +1,4 @@
-package kettle.controller;
+package org.example.kettle;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

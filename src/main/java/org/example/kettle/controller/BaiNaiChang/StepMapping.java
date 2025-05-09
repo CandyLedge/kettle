@@ -1,4 +1,4 @@
-package kettle.controller.BaiNaiChang;
+package org.example.kettle.controller.BaiNaiChang;
 
 import org.springframework.stereotype.Controller;
 

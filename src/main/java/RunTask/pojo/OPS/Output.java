@@ -17,7 +17,7 @@ public class Output {
         String tbName = cmd.split(" ")[2];
         String jsonStr = getJsonStr(result, tbName, dbConnectionId);
 /*        String url = "http://localhost:3000/api/query/preview";
-        String httpResult = HttpRequest.post(url)
+        String httpResult = HttpRequest.post(urlOu)
                                        .header("Content-Type", "application/json")
                                        .form(jsonStr)
                                        .timeout(2000)
@@ -54,8 +54,7 @@ public class Output {
     private static String getJsonStr(HashMap<String, String> result, String tbName, String dbConnectionId) {
         // 传入一个Map,将map转为insert into语句
         StringBuffer sql = new StringBuffer("insert into ");
-        sql.append(tbName)
-           .append("(");
+        sql.append(tbName);
         String column = String.join(", ", result.keySet());
         sql.append(column)
            .append(") values (");

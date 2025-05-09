@@ -1,4 +1,4 @@
-package kettle.controller.WWZ;
+package org.example.kettle.controller.WWZ;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
