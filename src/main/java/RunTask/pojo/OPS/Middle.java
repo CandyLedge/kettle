@@ -91,7 +91,7 @@ public class Middle {
 
     // 重命名字段
     public static List<HashMap<String, String>>
-    renameFields(List<HashMap<String, String>> datas, Map<String, String> fieldRenames) {
+    renameField(List<HashMap<String, String>> datas, Map<String, String> fieldRenames) {
         List<HashMap<String, String>> result = new ArrayList<>();
         for (HashMap<String, String> row : datas) {
             HashMap<String, String> newRow = new HashMap<>();
