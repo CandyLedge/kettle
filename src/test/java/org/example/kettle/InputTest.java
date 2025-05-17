@@ -48,4 +48,16 @@ public class InputTest {
             System.out.println("没有读取到数据！");
         }
     }
+
+    @Test
+    public void testInputXml(){
+        String cmd="xml /home/sa/project/java/kettle/pom.xml";
+        List<HashMap<String,String>> result=new ArrayList<>();
+        Input.input_xml(cmd,result);
+        System.out.println("XML 文件内容：");
+        result.forEach(System.out::println);
+        if(result.isEmpty()){
+            System.out.println();
+        }
+    }
 }

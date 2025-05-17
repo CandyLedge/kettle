@@ -1,56 +1,226 @@
 package RunTask.pojo.OPS;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class Middle {
-    // 这里封装了中间流程的操作 例如：过滤，数据处理···
-    public static void middle_whereDataByColumn(String cmd, List<Step> outputStep, List<HashMap<String, String>> result) {
-        String[] lings = cmd.split("\n");
-        String field = extractContentInBrackets(lings[0]);
-        HashMap<String, String> switchCase = new HashMap<>();
-        // 解析cmd字符串，获取switch case情况
-        for (int i = 1; i < lings.length; i++) {
-            String line = lings[i];
-            String key;
-            String value;
-            key = line.split(":")[0].split(" ")[1];
-            value = extractContentInBrackets(line.split(":")[1]);
-            switchCase.put(key, value);
+
+    /**
+     * 中间处理：根据列值路由到不同步骤
+     * 示例命令：where(field)\n case KEY1:(stepIndex1)\n case KEY2:(stepIndex2)
+     * @param cmd 操作命令字符串，第一行包含字段名，后续行定义值到步骤索引映射
+     * @param steps 可执行的步骤列表，每个步骤包含索引和类型
+     * @param dataRows 数据行列表，将对每行根据字段值执行对应步骤操作
+     */
+    public static void middle_whereDataByColumn(String cmd, List<Step> steps, List<HashMap<String, String>> dataRows) {
+        String[] lines = cmd.split("\\n");
+        String column = extractBracketContent(lines[0]);
+        Map<String, String> caseMap = new HashMap<>();
+        for (int i = 1; i < lines.length; i++) {
+            String[] parts = lines[i].split(":");
+            String key = parts[0].split(" ")[1];
+            String target = extractBracketContent(parts[1]);
+            caseMap.put(key, target);
         }
-        // 建立一个 步骤下标 -> 步骤对象的HashMap
-        HashMap<String, Step> indexToStepMap = new HashMap<>();
-        for (Step step : outputStep) {
-            String stepIndex = step.getStep()
-                                   .toString();
-            indexToStepMap.put(stepIndex, step);
+
+        Map<String, Step> stepIndexMap = new HashMap<>();
+        for (Step step : steps) {
+            stepIndexMap.put(step.getStep().toString(), step);
         }
-        // 进行数据分类
-        for (HashMap<String, String> row : result) {
-            String value = row.get(field);
-            String goToStep = switchCase.get(value);
-            Step step = indexToStepMap.get(goToStep);
+
+        for (HashMap<String, String> row : dataRows) {
+            String cellValue = row.get(column);
+            Step step = stepIndexMap.get(caseMap.get(cellValue));
+            if (step == null) continue;
             switch (step.getType()) {
                 case "output-database":
                     Output.output_database(step.getPrivateField(), row);
                     break;
                 default:
-                    throw new RuntimeException("出现了未知的输出类型！");
+                    throw new RuntimeException("未知输出类型: " + step.getType());
             }
-
         }
     }
-    
-    // 传入一个字符串，返回括号里的内容
-    private static String extractContentInBrackets(String input) {
-        // 使用正则表达式匹配括号内的内容
-        String regex = "\\((.*?)\\)";
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
-        java.util.regex.Matcher matcher = pattern.matcher(input);
-        
-        if (matcher.find()) {
-            return matcher.group(1); // 返回第一个匹配组的内容
+
+    /**
+     * 中间处理：数据过滤（Filter Rows）
+     * 支持条件：>, <, =, >=, <=
+     * 示例命令：filter(age>=18)
+     * @param cmd 包含字段名与条件表达式的命令
+     * @param dataRows 待过滤的数据行列表
+     */
+    public static void filterRows(String cmd, List<HashMap<String, String>> dataRows) {
+        String condition = extractBracketContent(cmd);
+        if (condition == null || condition.isEmpty()) return;
+
+        Pattern conditionPattern = Pattern.compile("(\\w+)\\s*(>=|<=|=|<|>)\\s*(\\S+)");
+        Matcher matcher = conditionPattern.matcher(condition);
+        if (!matcher.find()) return;
+
+        String field = matcher.group(1);
+        String operator = matcher.group(2);
+        String valueLiteral = matcher.group(3);
+
+        dataRows.removeIf(row -> {
+            String cell = row.get(field);
+            if (cell == null) return true;
+            try {
+                double numCell = Double.parseDouble(cell);
+                double numValue = Double.parseDouble(valueLiteral);
+                switch (operator) {
+                    case ">":  return numCell <= numValue;
+                    case "<":  return numCell >= numValue;
+                    case "=":  return numCell != numValue;
+                    case ">=": return numCell < numValue;
+                    case "<=": return numCell > numValue;
+                    default:    return true;
+                }
+            } catch (NumberFormatException e) {
+                return "=".equals(operator) ? !cell.equals(valueLiteral) : true;
+            }
+        });
+    }
+
+    /**
+     * 中间处理：字段拆行（Split Field to Rows）
+     * 支持格式：split(field) 或 split(field, ',') 或 split(field, "|")
+     * 示例命令：split(tags ,)
+     * @param cmd 包含字段名和可选分隔符的命令
+     * @param dataRows 待拆分的数据行列表，将在方法内重写为多行结构
+     */
+    public static void splitFieldToRows(String cmd, List<HashMap<String, String>> dataRows) {
+        String args = extractBracketContent(cmd);
+        if (args == null || args.isEmpty()) return;
+
+        Pattern splitPattern = Pattern.compile("^([a-zA-Z0-9_]+)(?:\\s*,\\s*['\"]?(.*?)['\"]?)?$");
+        Matcher matcher = splitPattern.matcher(args);
+        if (!matcher.matches()) return;
+
+        String field = matcher.group(1);
+        String delimiter = matcher.group(2) != null ? matcher.group(2) : ",";
+
+        List<HashMap<String, String>> expanded = new ArrayList<>();
+        for (HashMap<String, String> row : dataRows) {
+            String cell = row.get(field);
+            if (cell == null) continue;
+            if (delimiter.isEmpty()) {
+                expanded.add(new HashMap<>(row));
+                continue;
+            }
+            for (String part : cell.split(Pattern.quote(delimiter))) {
+                HashMap<String, String> newRow = new HashMap<>(row);
+                newRow.put(field, part.trim());
+                expanded.add(newRow);
+            }
         }
-        return null; // 如果没有找到匹配的内容，返回 null
+
+        dataRows.clear();
+        dataRows.addAll(expanded);
+    }
+
+
+    /**
+     * 中间处理：数值分段（Number Range）
+     * 支持命令格式：range(field) [as targetField] 0-59:low,60-89:mid,90-100:high
+     * 示例命令：range(score) 0-59:low,60-89:mid,90-100:high
+     * @param cmd 包含字段名、可选目标字段及映射定义的命令
+     * @param dataRows 待处理的数据行列表，将新增分段结果字段
+     */
+    public static void mapNumberRange(String cmd, List<HashMap<String, String>> dataRows) {
+        String field = extractBracketContent(cmd);
+        if (field == null || field.isEmpty()) return;
+
+        String rest = cmd.substring(cmd.indexOf(')') + 1).trim();
+        String targetField = field + "_range";
+        String definitions = rest;
+        if (rest.startsWith("as ")) {
+            int idx = rest.indexOf(' ', 3);
+            if (idx == -1) idx = rest.length();
+            targetField = rest.substring(3, idx).trim();
+            definitions = rest.substring(idx).trim();
+        }
+
+        Map<Range, String> ranges = new LinkedHashMap<>();
+        for (String part : definitions.split(",")) {
+            String[] kv = part.trim().split(":");
+            if (kv.length != 2) continue;
+            String[] bounds = kv[0].split("-");
+            if (bounds.length != 2) continue;
+            try {
+                double low = Double.parseDouble(bounds[0].trim());
+                double high = Double.parseDouble(bounds[1].trim());
+                ranges.put(new Range(low, high), kv[1].trim());
+            } catch (NumberFormatException ignored) {}
+        }
+
+        for (HashMap<String, String> row : dataRows) {
+            String cell = row.get(field);
+            if (cell == null) continue;
+            try {
+                double num = Double.parseDouble(cell);
+                for (Map.Entry<Range, String> e : ranges.entrySet()) {
+                    if (e.getKey().contains(num)) {
+                        row.put(targetField, e.getValue());
+                        break;
+                    }
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+    }
+
+    /**
+     * 辅助方法：提取括号内容，供多方法使用
+     * @param text 包含括号的字符串
+     * @return 括号内的内容或 null
+     */
+    private static String extractBracketContent(String text) {
+        int start = text.indexOf('(');
+        if (start < 0) return null;
+        int balance = 1;
+        for (int i = start + 1; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '(') balance++;
+            else if (c == ')') {
+                balance--;
+                if (balance == 0) return text.substring(start + 1, i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 辅助方法：检测正则模式中的括号是否平衡
+     * @param pattern 正则模式字符串
+     * @return 括号平衡返回 true
+     */
+    private static boolean areParenthesesBalanced(String pattern) {
+        int balance = 0;
+        boolean inClass = false;
+        for (int i = 0; i < pattern.length(); i++) {
+            char c = pattern.charAt(i);
+            if (c == '\\') { i++; continue; }
+            if (c == '[' && !inClass) { inClass = true; }
+            else if (c == ']' && inClass) { inClass = false; }
+            else if (!inClass) {
+                if (c == '(') balance++;
+                else if (c == ')') {
+                    balance--;
+                    if (balance < 0) return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 辅助类：数值范围映射的表示类
+     */
+    private static class Range {
+        private final double low;
+        private final double high;
+        Range(double low, double high) { this.low = low; this.high = high; }
+        boolean contains(double v) { return v >= low && v <= high; }
     }
 }
