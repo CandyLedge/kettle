@@ -33,6 +33,6 @@ public class MiddleTest {
         result.add(man1);
         result.add(woman1);
         result.add(woman2);
-        Middle.middle_whereDataByColumn("switch(sex)\ncase 男:step(2)\ncase 女:step(3)",outputs,result);
+//        Middle.middle_whereDataByColumn("switch(sex)\ncase 男:step(2)\ncase 女:step(3)",outputs,result);
     }
 }

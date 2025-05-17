@@ -13,6 +13,7 @@ import cn.hutool.core.io.FileUtil;
 public class Input {
     // 这里封装了输入的操作 都是静态方法，因为要打包出去重复使用
     // 方法名以该类的名称小写开头，下划线分割，后面写具体的事，其他类同理
+    // 注意，middle和output中的命名要和json一致，因为要通过反射调用!!!
 
     /**
      * csv 文本解析： 以逗号作为分隔符
