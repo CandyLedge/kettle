@@ -9,15 +9,15 @@ public class QuChong<K, V> extends HashMap<K, V> {
     @Override
     public V put(K key, V value) {
         if (value == null) {
-            return null; // 直接忽略 null 值
+            return null; // 直接忽略 null
         }
 
-        // 如果 value 已存在，不插入
+        // 如果value存在，不插入
         if (values.contains(value)) {
             return null;
         }
 
-        // 否则就记录 value，调用正常的 put 方法
+        // 否则就记录value，调用正常的 put 方法
         values.add(value);
         return super.put(key, value);
     }
