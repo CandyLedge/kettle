@@ -53,13 +53,14 @@ public class MiddleStepDealwith {
                 try {
                     Method method = Class.forName("RunTask.pojo.OPS.Middle")
                                          .getMethod(stepFunction, String.class, HashMap.class, List.class);
+                    //noinspection unchecked
                     HashMap<String, List<HashMap<String, String>>> stepToDatas = (HashMap<String, List<HashMap<String, String>>>) method.invoke(null, start.getPrivateField(), indexToStepMap, results);
                     for (String step : stepToDatas.keySet()) {
                         List<HashMap<String, String>> datas = stepToDatas.get(step);
-                        new MiddleStepDealwith(nexts.get(0), indexToStepMap, results).exec();
+                        new MiddleStepDealwith(indexToStepMap.get(step), indexToStepMap, datas).exec();
                     }
                 } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage() + this);
+                    throw new RuntimeException(e.getMessage() + this.start.toString());
                 }
             }
         } else {

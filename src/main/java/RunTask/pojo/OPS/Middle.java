@@ -43,16 +43,6 @@ public class Middle {
     public static void sort(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> result) {
     
     }
-    
-    /*private static void dataToOutPut(HashMap<String, String> row, Step step) {
-        switch (step.getType()) {
-            case "output-database":
-                Output.database(step.getPrivateField(), row);
-                break;
-            default:
-                throw new RuntimeException("出现了未知的输出类型！");
-        }
-    }*/
     // 传入一个字符串，返回括号里的内容
     private static String extractContentInBrackets(String input) {
         // 使用正则表达式匹配括号内的内容
