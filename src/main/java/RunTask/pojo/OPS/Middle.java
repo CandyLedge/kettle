@@ -3,6 +3,7 @@ package RunTask.pojo.OPS;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Middle {
     // 这里封装了中间流程的操作 例如：过滤，数据处理···
@@ -55,4 +56,90 @@ public class Middle {
         }
         return null; // 如果没有找到匹配的内容，返回 null
     }
+
+    // 选择字段，从m个字段中选择n个字段
+    public static List<HashMap<String, String>>
+    selectFields(List<HashMap<String, String>> datas, List<String> selectedFields) {
+        List<HashMap<String, String>> result = new ArrayList<>();
+        for (HashMap<String, String> row : datas) {
+            HashMap<String, String> newRow = new HashMap<>();
+            for (String field : selectedFields) {
+                if (row.containsKey(field)) {
+                    newRow.put(field, row.get(field));
+                }
+            }
+            result.add(newRow);
+        }
+        return result;
+    }
+
+    // 删除字段，从m个字段中删除n个字段
+
+    //该方法会遍历输入的每条数据记录，删除其中指定的字段，最后返回处理后的结果列表。
+    public static List<HashMap<String, String>>
+    deleteFields(List<HashMap<String, String>> datas, List<String> fieldsToDelete) {
+        List<HashMap<String, String>> result = new ArrayList<>();
+        for (HashMap<String, String> row : datas) {
+            HashMap<String, String> newRow = new HashMap<>(row);
+            for (String field : fieldsToDelete) {
+                newRow.remove(field);
+            }
+            result.add(newRow);
+        }
+        return result;
+    }
+
+    // 重命名字段
+    public static List<HashMap<String, String>>
+    renameFields(List<HashMap<String, String>> datas, Map<String, String> fieldRenames) {
+        List<HashMap<String, String>> result = new ArrayList<>();
+        for (HashMap<String, String> row : datas) {
+            HashMap<String, String> newRow = new HashMap<>();
+            for (Map.Entry<String, String> entry : row.entrySet()) {
+                String oldField = entry.getKey();
+                String value = entry.getValue();
+                if (fieldRenames.containsKey(oldField)) {
+                    String newField = fieldRenames.get(oldField);
+                    newRow.put(newField, value);
+                } else {
+                    newRow.put(oldField, value);
+                }
+            }
+            result.add(newRow);
+        }
+        return result;
+    }
+
+    public static List<HashMap<String, Object>>
+    modifyFieldType(List<HashMap<String, String>> datas, Map<String, Class<?>> fieldTypeChanges) {
+        List<HashMap<String, Object>> result = new ArrayList<>();
+        for (HashMap<String, String> row : datas) {
+            HashMap<String, Object> newRow = new HashMap<>();
+            for (Map.Entry<String, String> entry : row.entrySet()) {
+                String field = entry.getKey();
+                String value = entry.getValue();
+                if (fieldTypeChanges.containsKey(field)) {
+                    Class<?> newType = fieldTypeChanges.get(field);
+                    try {
+                        if (newType == Integer.class) {
+                            newRow.put(field, Integer.parseInt(value));
+                        } else if (newType == Double.class) {
+                            newRow.put(field, Double.parseDouble(value));
+                        } else if (newType == Boolean.class) {
+                            newRow.put(field, Boolean.parseBoolean(value));
+                        } else {
+                            newRow.put(field, value);
+                        }
+                    } catch (NumberFormatException e) {
+                        newRow.put(field, value);
+                    }
+                } else {
+                    newRow.put(field, value);
+                }
+            }
+            result.add(newRow);
+        }
+        return result;
+    }
+
 }
