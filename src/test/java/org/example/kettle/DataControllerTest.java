@@ -2,7 +2,6 @@ package org.example.kettle;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kettle.controller.WWZ.DataController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
