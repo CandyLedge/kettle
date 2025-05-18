@@ -78,4 +78,24 @@ public class Middle {
         result.clear();
         result.addAll(filteredResult);
     }
+
+
+    public static void deleteFields(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> result) {
+        //cmd是指定删除的字段，result是指定删除的字段所在的数据
+        String[] fieldArray = cmd.split(",");
+        List<String> fieldsToDelete = new ArrayList<>();
+        for (String field : fieldArray) {
+            fieldsToDelete.add(field.trim());
+        }
+        for (HashMap<String, String> row : result) {
+            for (String field : fieldsToDelete) {
+                row.remove(field);
+            }
+        }
+    }
+
+
+
+
+
 }
