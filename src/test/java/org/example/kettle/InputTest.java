@@ -42,5 +42,17 @@ public class InputTest {
 
         assertFalse(result.isEmpty(), "JSON 文件应包含数据！");
     }
+
+    @Test
+    public void testInputXml(){
+        String cmd="xml /home/sa/project/java/kettle/pom.xml";
+        List<HashMap<String,String>> result=new ArrayList<>();
+        Input.input_xml(cmd,result);
+        System.out.println("XML 文件内容：");
+        result.forEach(System.out::println);
+        if(result.isEmpty()){
+            System.out.println();
+        }
+    }
 }
 
