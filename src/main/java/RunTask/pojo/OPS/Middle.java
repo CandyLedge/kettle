@@ -47,6 +47,7 @@ public class Middle {
     public static void sort(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> result) {
     
     }
+    
     // 传入一个字符串，返回括号里的内容
     private static String extractContentInBrackets(String input) {
         // 使用正则表达式匹配括号内的内容
@@ -59,10 +60,10 @@ public class Middle {
         }
         return null; // 如果没有找到匹配的内容，返回 null
     }
-}
-
+    
     /**
      * 辅助方法：提取括号内容，供多方法使用
+     *
      * @param text 包含括号的字符串
      * @return 括号内的内容或 null
      */
@@ -80,9 +81,10 @@ public class Middle {
         }
         return null;
     }
-
+    
     /**
      * 辅助方法：检测正则模式中的括号是否平衡
+     *
      * @param pattern 正则模式字符串
      * @return 括号平衡返回 true
      */
@@ -91,10 +93,13 @@ public class Middle {
         boolean inClass = false;
         for (int i = 0; i < pattern.length(); i++) {
             char c = pattern.charAt(i);
-            if (c == '\\') { i++; continue; }
-            if (c == '[' && !inClass) { inClass = true; }
-            else if (c == ']' && inClass) { inClass = false; }
-            else if (!inClass) {
+            if (c == '\\') {
+                i++;
+                continue;
+            }
+            if (c == '[' && !inClass) { inClass = true; } else if (c == ']' && inClass) {
+                inClass = false;
+            } else if (!inClass) {
                 if (c == '(') balance++;
                 else if (c == ')') {
                     balance--;
@@ -104,14 +109,19 @@ public class Middle {
         }
         return true;
     }
-
+    
     /**
      * 辅助类：数值范围映射的表示类
      */
     private static class Range {
         private final double low;
         private final double high;
-        Range(double low, double high) { this.low = low; this.high = high; }
+        
+        Range(double low, double high) {
+            this.low = low;
+            this.high = high;
+        }
+        
         boolean contains(double v) { return v >= low && v <= high; }
     }
 }
