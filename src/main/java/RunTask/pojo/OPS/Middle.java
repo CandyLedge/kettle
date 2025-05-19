@@ -54,7 +54,7 @@ public class Middle {
         if (matcher.find()) {
             return matcher.group(1); // 返回第一个匹配组的内容
         }
-        return null; // 如果没有找到匹配的内容，返回 null
+        return null; // 如果没有找到匹配的内容返回 null
     }
 
 

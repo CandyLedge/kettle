@@ -12,7 +12,7 @@ public class KettleRange {
 
     /**
      * 对列表中每个 HashMap 里的指定字段进行数值分段
-     * @param cmd 包含字段名、分段规则和结果字段名的命令字符串，格式为 "fieldName,min1-max1:label1,min2-max2:label2,resultField"
+     * @param cmd 包含字段名、分段规则和结果字段名的命令字符串格式为 "fieldName,min1-max1:label1,min2-max2:label2,resultField"
      * @param indexToStepMap 存储步骤索引和 Step 对象映射的 HashMap
      * @param result 包含多个 HashMap 的列表，每个 HashMap 代表一行数据
      */

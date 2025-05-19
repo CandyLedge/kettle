@@ -35,7 +35,7 @@ public class Wtest {
         HashMap<String, Step> indexToStepMap = new HashMap<>(); // 这个参数在当前方法中没有使用
         renameFields(cmd, indexToStepMap, result);
 
-        // 打印重命名后的数据
+        // 打印重命名
         System.out.println("重命名后的数据:");
         for (HashMap<String, String> row : result) {
             System.out.println(row);
