@@ -78,24 +78,100 @@ public class Middle {
         result.clear();
         result.addAll(filteredResult);
     }
+ /**
+ * 删除 result 中每条记录指定的字段
+ *
+ * @param cmd 命令字符串，逗号分隔多个字段名
+ * @param indexToStepMap 映射索引到 Step 的 Map（当前方法未使用）
+ * @param result 数据集合，每个元素是一个字段-值映射
+ */
+public static void deleteFields(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> result) {
+    if (cmd == null || result == null) {
+        throw new IllegalArgumentException("参数 cmd 或 result 不能为 null");
+    }
+    String[] fieldArray = cmd.split(",");
+    List<String> fieldsToDelete = new ArrayList<>();
+    for (String field : fieldArray) {
+        fieldsToDelete.add(field.trim());
+    }
+    for (HashMap<String, String> row : result) {
+        for (String field : fieldsToDelete) {
+            if (!row.containsKey(field)) {
+                 System.out.println("字段不存在: " + field);
+            }
+            row.remove(field);
+        }
+    }
+}
 
-
-    public static void deleteFields(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> result) {
-        //cmd是指定删除的字段，result是指定删除的字段所在的数据
-        String[] fieldArray = cmd.split(",");
-        List<String> fieldsToDelete = new ArrayList<>();
-        for (String field : fieldArray) {
-            fieldsToDelete.add(field.trim());
+    public static void renameFields(String cmd, HashMap<String, Step> indexToStepMap,
+                                    List<HashMap<String, String>> result) {//重命名
+        if (cmd == null || result == null) {
+            return;
+        }
+        String[] renamePairs = cmd.split(",");
+        Map<String, String> renameMap = new HashMap<>();
+        for (String pair : renamePairs) {
+            String[] fields = pair.split("=");
+            if (fields.length == 2) {
+                String oldField = fields[0].trim();
+                String newField = fields[1].trim();
+                renameMap.put(oldField, newField);
+            }
         }
         for (HashMap<String, String> row : result) {
-            for (String field : fieldsToDelete) {
-                row.remove(field);
+            for (Map.Entry<String, String> entry : renameMap.entrySet()) {
+                String oldField = entry.getKey();
+                String newField = entry.getValue();
+                if (row.containsKey(oldField)) {
+                    String value = row.get(oldField);
+                    row.remove(oldField);
+                    row.put(newField, value);
+                }
             }
         }
     }
 
-
-
-
-
+    public static void range(String cmd, HashMap<String, Step> indexToStepMap,
+                             List<HashMap<String, String>> result) {//数值分段
+        if (cmd == null || result == null) {
+            return;
+        }
+        String[] parts = cmd.split(",");
+        String fieldName = parts[0];
+        String resultField = parts[parts.length - 1];
+        Map<String, String> rangeMap = new HashMap<>();
+        for (int i = 1; i < parts.length - 1; i++) {
+            String[] rangeLabel = parts[i].split(":");
+            String range = rangeLabel[0];
+            String label = rangeLabel[1];
+            rangeMap.put(range, label);
+        }
+        for (HashMap<String, String> row : result) {
+            if (row.containsKey(fieldName)) {
+                String valueStr = row.get(fieldName);
+                try {
+                    double value = Double.parseDouble(valueStr);
+                    String label = getRangeLabel(value, rangeMap);
+                    row.put(resultField, label);
+                } catch (NumberFormatException e) {
+                    row.put(resultField, "Invalid");
+                }
+            } else {
+                row.put(resultField, "Missing");
+            }
+        }
+    }
+    private static String getRangeLabel(double value, Map<String, String> rangeMap) {
+        for (Map.Entry<String, String> entry : rangeMap.entrySet()) {
+            String range = entry.getKey();
+            String[] minMax = range.split("-");
+            double min = Double.parseDouble(minMax[0]);
+            double max = Double.parseDouble(minMax[1]);
+            if (value >= min && value < max) {
+                return entry.getValue();
+            }
+        }
+        return "Out of range";
+    }
 }
