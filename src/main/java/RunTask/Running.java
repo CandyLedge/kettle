@@ -1,5 +1,6 @@
 package RunTask;
 
+import RunTask.pojo.MiddleStepDealwith;
 import RunTask.pojo.OPS.Input;
 import RunTask.pojo.OPS.Middle;
 import RunTask.pojo.OPS.Step;
@@ -15,11 +16,10 @@ public class Running {
         List<Step> steps = process.getSteps();
         List<Step> input = new ArrayList<>();
         List<Step> middle = new ArrayList<>();
-        List<Step> output = new ArrayList<>();
         // HashMap -> 对象
         // List<HashMap> -> 多个对象
         List<HashMap<String, String>> result = new ArrayList<>();
-        // 将步骤分为3大类
+        
         steps.forEach(step -> {
             if (step.getType()
                     .startsWith("input")) {
@@ -28,10 +28,6 @@ public class Running {
             if (step.getType()
                     .startsWith("middle")) {
                 middle.add(step);
-            }
-            if (step.getType()
-                    .startsWith("output")) {
-                output.add(step);
             }
         });
         // 处理input类
@@ -51,17 +47,17 @@ public class Running {
             }
         }
         
-        // 处理middle类
-        for (Step step : middle) {
-            String mode = step.getType()
-                                   .split("-")[1];
-            switch (mode){
-                case "where_data_by_column":
-                    Middle.middle_whereDataByColumn(step.getPrivateField(), output, result);
-                    break;
-                default:
-                    throw new RuntimeException("有没处理的middle！");
+        // 建立一个 步骤下标 -> 步骤对象的HashMap (不包含input步骤)
+        HashMap<String, Step> indexToStepMap = new HashMap<>();
+        for (Step step : steps) {
+            if (step.getType()
+                    .startsWith("input")) {
+                continue;
             }
+            String stepIndex = step.getStep()
+                                   .toString();
+            indexToStepMap.put(stepIndex, step);
         }
+        new MiddleStepDealwith(middle.get(0), indexToStepMap, result).exec();
     }
 }

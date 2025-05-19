@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class Output {
     // 这里封装了输出的操作 例如：数据库，文件···
-    public static void output_database(String cmd, HashMap<String, String> result) {
+    public static void database(String cmd, HashMap<String, String> result) {
         String dbConnectionId = cmd.split(" ")[1];
         String tbName = cmd.split(" ")[2];
         String jsonStr = getJsonStr(result, tbName, dbConnectionId);
@@ -27,8 +27,9 @@ public class Output {
         System.out.println("jsonStr = " + jsonStr);
     }
     
-    public static void output_csv(String cmd, HashMap<String, String> result) {
+    public static void csv(String cmd, HashMap<String, String> result) {
         JFrame frame = new JFrame("请选择文件夹作为输出目录！");
+        
         String csvFileName = cmd.split(" ")[1];
         String fileParentPath = "";
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
