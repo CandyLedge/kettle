@@ -9,6 +9,7 @@ import RunTask.pojo.Process;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // 传入process开始执行任务
 public class Running {
@@ -39,14 +40,10 @@ public class Running {
                 case "csv":
                     Input.input_csv(step.getPrivateField(), result);
                     break;
-                case "json":
-                    Input.input_json(step.getPrivateField(), result);
-                    break;
                 default:
                     throw new RuntimeException("有没处理的input！");
             }
         }
-        
         // 建立一个 步骤下标 -> 步骤对象的HashMap (不包含input步骤)
         HashMap<String, Step> indexToStepMap = new HashMap<>();
         for (Step step : steps) {
