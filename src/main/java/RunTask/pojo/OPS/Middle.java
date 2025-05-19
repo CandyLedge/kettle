@@ -3,6 +3,10 @@ package RunTask.pojo.OPS;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class Middle {
     // 这里封装了中间流程的操作 例如：过滤，数据处理···
@@ -54,5 +58,60 @@ public class Middle {
             return matcher.group(1); // 返回第一个匹配组的内容
         }
         return null; // 如果没有找到匹配的内容，返回 null
+    }
+}
+
+    /**
+     * 辅助方法：提取括号内容，供多方法使用
+     * @param text 包含括号的字符串
+     * @return 括号内的内容或 null
+     */
+    private static String extractBracketContent(String text) {
+        int start = text.indexOf('(');
+        if (start < 0) return null;
+        int balance = 1;
+        for (int i = start + 1; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '(') balance++;
+            else if (c == ')') {
+                balance--;
+                if (balance == 0) return text.substring(start + 1, i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 辅助方法：检测正则模式中的括号是否平衡
+     * @param pattern 正则模式字符串
+     * @return 括号平衡返回 true
+     */
+    private static boolean areParenthesesBalanced(String pattern) {
+        int balance = 0;
+        boolean inClass = false;
+        for (int i = 0; i < pattern.length(); i++) {
+            char c = pattern.charAt(i);
+            if (c == '\\') { i++; continue; }
+            if (c == '[' && !inClass) { inClass = true; }
+            else if (c == ']' && inClass) { inClass = false; }
+            else if (!inClass) {
+                if (c == '(') balance++;
+                else if (c == ')') {
+                    balance--;
+                    if (balance < 0) return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 辅助类：数值范围映射的表示类
+     */
+    private static class Range {
+        private final double low;
+        private final double high;
+        Range(double low, double high) { this.low = low; this.high = high; }
+        boolean contains(double v) { return v >= low && v <= high; }
     }
 }

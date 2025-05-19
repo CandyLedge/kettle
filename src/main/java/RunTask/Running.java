@@ -39,6 +39,9 @@ public class Running {
                 case "csv":
                     Input.input_csv(step.getPrivateField(), result);
                     break;
+                case "json":
+                    Input.input_json(step.getPrivateField(), result);
+                    break;
                 default:
                     throw new RuntimeException("有没处理的input！");
             }
