@@ -37,7 +37,7 @@ public class Middle {
             String step = columnToStep.get(row.get(field));
             stepToData.get(step).add(row);
         }
-        return stepToData;
+        return stepToData;//lihe
     }
     
     public static void sort(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> result) {
