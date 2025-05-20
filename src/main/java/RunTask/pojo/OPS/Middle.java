@@ -223,4 +223,37 @@ public class Middle {
         Range(double low, double high) { this.low = low; this.high = high; }
         boolean contains(double v) { return v >= low && v <= high; }
     }
+
+    /**
+     * 中间处理：排序数据（Sort Rows）
+     * 示例命令：sort(score, desc)
+     * @param cmd 包含字段名与可选排序方向的命令
+     * @param dataRows 待排序的数据行列表
+     */
+    public static void sortRows(String cmd, List<HashMap<String, String>> dataRows) {
+        String args = extractBracketContent(cmd);
+        if (args == null || args.isEmpty()) return;
+
+        String[] parts = args.split("\\s*,\\s*");
+        String field = parts[0];
+        boolean descending = parts.length > 1 && "desc".equalsIgnoreCase(parts[1]);
+
+        dataRows.sort((row1, row2) -> {
+            String val1 = row1.get(field);
+            String val2 = row2.get(field);
+            if (val1 == null) return 1;
+            if (val2 == null) return -1;
+
+            try {
+                double num1 = Double.parseDouble(val1);
+                double num2 = Double.parseDouble(val2);
+                return descending ? Double.compare(num2, num1) : Double.compare(num1, num2);
+            } catch (NumberFormatException e) {
+                return descending ? val2.compareTo(val1) : val1.compareTo(val2);
+            }
+        });
+    }
+
+
+
 }
