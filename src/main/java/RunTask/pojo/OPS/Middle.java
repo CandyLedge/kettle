@@ -254,6 +254,93 @@ public class Middle {
         });
     }
 
+    /**
+     * 中间处理：行转列（Pivot）
+     * 示例命令：pivot(department, name)
+     * @param cmd 包含主字段和目标字段的命令
+     * @param dataRows 原始数据行列表，方法内部会构造新结构
+     */
+    public static void pivotRows(String cmd, List<HashMap<String, String>> dataRows) {
+        String args = extractBracketContent(cmd);
+        if (args == null || args.isEmpty()) return;
+
+        String[] parts = args.split("\\s*,\\s*");
+        if (parts.length < 2) return;
+        String groupField = parts[0];
+        String valueField = parts[1];
+
+        // 用 Map 聚合
+        Map<String, List<String>> pivotMap = new LinkedHashMap<>();
+        for (HashMap<String, String> row : dataRows) {
+            String key = row.get(groupField);
+            String val = row.get(valueField);
+            if (key == null || val == null) continue;
+            pivotMap.computeIfAbsent(key, k -> new ArrayList<>()).add(val);
+        }
+
+        // 重建行
+        dataRows.clear();
+        for (Map.Entry<String, List<String>> entry : pivotMap.entrySet()) {
+            HashMap<String, String> newRow = new HashMap<>();
+            newRow.put(groupField, entry.getKey());
+            int i = 1;
+            for (String val : entry.getValue()) {
+                newRow.put(valueField + "_" + i++, val);
+            }
+            dataRows.add(newRow);
+        }
+    }
+
+    /**
+     * 中间处理：字段计算（Field Calculation）
+     * 示例命令：calc(total = score1 + score2)
+     * @param cmd 包含目标字段与表达式
+     * @param dataRows 原始数据行，将添加计算结果
+     */
+    public static void calculateField(String cmd, List<HashMap<String, String>> dataRows) {
+        String expression = extractBracketContent(cmd);
+        if (expression == null || !expression.contains("=")) return;
+
+        String[] parts = expression.split("=");
+        String targetField = parts[0].trim();
+        String formula = parts[1].trim();
+
+        Pattern p = Pattern.compile("([a-zA-Z0-9_]+|\\d+(\\.\\d+)?)(\\s*[+\\-*/]\\s*)([a-zA-Z0-9_]+|\\d+(\\.\\d+)?)");
+        Matcher m = p.matcher(formula);
+        if (!m.matches()) return;
+
+        String left = m.group(1).trim();
+        String op = m.group(3).trim();
+        String right = m.group(4).trim();
+
+        for (HashMap<String, String> row : dataRows) {
+            try {
+                double l = isNumber(left) ? Double.parseDouble(left) : Double.parseDouble(row.getOrDefault(left, "0"));
+                double r = isNumber(right) ? Double.parseDouble(right) : Double.parseDouble(row.getOrDefault(right, "0"));
+                double result;
+                switch (op) {
+                    case "+": result = l + r; break;
+                    case "-": result = l - r; break;
+                    case "*": result = l * r; break;
+                    case "/": result = r != 0 ? l / r : 0; break;
+                    default: continue;
+                }
+                row.put(targetField, String.valueOf(result));
+            } catch (Exception e) {
+                row.put(targetField, "0");
+            }
+        }
+    }
+
+    private static boolean isNumber(String s) {
+        try {
+            Double.parseDouble(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 
 
 }
