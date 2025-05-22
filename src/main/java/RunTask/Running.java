@@ -53,17 +53,7 @@ public class Running {
             }
         }
         // 去重
-        QuChong<Integer, Map<String, String>> uniqueMap = new QuChong<>();
-        int index = 0;
-        for (HashMap<String, String> row : result) {
-            uniqueMap.put(index++, row); // 使用索引作为 key，避免影响去重逻辑
-        }
-
-        // 清空原 result，并重新加入去重后的数据
-        result.clear();
-        for (Map.Entry<Integer, Map<String, String>> entry : uniqueMap.entrySet()) {
-            result.add((HashMap<String, String>) entry.getValue());
-        }
+        QuChong.quChong("", result);
         // 处理middle类
         for (Step step : middle) {
             String mode = step.getType()

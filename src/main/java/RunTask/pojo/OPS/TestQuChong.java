@@ -1,13 +1,34 @@
 package RunTask.pojo.OPS;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class TestQuChong {
     public static void main(String[] args) {
-        QuChong<String, String> uniqueMap = new QuChong<>();
+        List<HashMap<String, String>> dataList = new ArrayList<>();
 
-        uniqueMap.put("a", "abc");
-        uniqueMap.put("b", "def");
-        uniqueMap.put("c", "abc"); // 这个不插
+        HashMap<String, String> row1 = new HashMap<>();
+        row1.put("name", "abc");
+        row1.put("age", "20");
 
-        System.out.println("Map 内容: " + uniqueMap); // 输出 {a=apple, b=banana}
+        HashMap<String, String> row2 = new HashMap<>();
+        row2.put("name", "def");
+        row2.put("age", "25");
+
+        HashMap<String, String> row3 = new HashMap<>();
+        row3.put("name", "abc");  // 重复
+        row3.put("age", "20");
+
+        dataList.add(row1);
+        dataList.add(row2);
+        dataList.add(row3);
+
+        //System.out.println("原始数据: " + dataList);
+
+        // 调用静态去重方法
+        QuChong.quChong("", dataList);  // cmd参数可传空字符串
+
+        System.out.println("去重后数据: " + dataList);
     }
 }
