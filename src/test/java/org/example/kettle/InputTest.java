@@ -36,16 +36,4 @@ public class InputTest {
             System.out.println("成功读取 " + result.size() + " 条数据！");
         }
     }
-
-    @Test
-    public void testInputJson() {
-        String cmd = "json /home/sa/project/java/kettle/src/test/java/org/example/kettle/gugugu.json";
-        List<HashMap<String, String>> result = new ArrayList<>();
-        Input.input_json(cmd, result);
-        System.out.println("JSON 文件内容：");
-        result.forEach(System.out::println);
-        if (result.isEmpty()) {
-            System.out.println("没有读取到数据！");
-        }
-    }
 }
