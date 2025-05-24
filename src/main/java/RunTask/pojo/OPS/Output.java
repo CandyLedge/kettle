@@ -28,23 +28,8 @@ public class Output {
     }
     
     public static void csv(String cmd, HashMap<String, String> result) {
-        JFrame frame = new JFrame("请选择文件夹作为输出目录！");
-        
         String csvFileName = cmd.split(" ")[1];
-        String fileParentPath = "";
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(300, 200);
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int choose = fileChooser.showOpenDialog(frame);
-        if (choose == JFileChooser.APPROVE_OPTION) {
-            File selectedFolder = fileChooser.getSelectedFile();
-            fileParentPath = selectedFolder.getAbsolutePath();
-            System.out.println("Selected Folder: " + selectedFolder.getAbsolutePath());
-        }
-        frame.dispose();
-        CsvWriter writer = CsvUtil.getWriter(Paths.get(fileParentPath, csvFileName + ".csv")
-                                                  .toString(), CharsetUtil.CHARSET_UTF_8);
+        CsvWriter writer = CsvUtil.getWriter(csvFileName, CharsetUtil.CHARSET_UTF_8);
         String[] values = result.values()
                                 .toArray(new String[]{});
         writer.write(values);

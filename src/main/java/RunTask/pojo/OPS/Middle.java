@@ -14,7 +14,7 @@ public class Middle {
     // 这个方法返回一个键值对，key代表这一组数据应该去哪一步，value代表一组数据
     
     /// 步骤对应一组数据
-    public static HashMap<String, List<HashMap<String, String>>> middle_whereDataByColumn(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> datas) {
+    public static HashMap<String, List<HashMap<String, String>>> where_data_by_column(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> datas) {
         /// -----------------------------------------------------------
         HashMap<String, List<HashMap<String, String>>> stepToData = new HashMap<>();
         String[] lings = cmd.split("\n");
@@ -44,6 +44,23 @@ public class Middle {
         return stepToData;
     }
     
+    public static void fieldMerge(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> results) {
+        String[] split = cmd.split(" ");
+        if (split.length != 4) {
+            throw new RuntimeException("字段合并的步骤出错！原因：privateField 字符串 传入错误！");
+        }
+        String field_1 = split[0];
+        String field_2 = split[1];
+        String mergedField = split[2];
+        for (HashMap<String, String> data : results) {
+            String v_1 = data.get(field_1);
+            String v_2 = data.get(field_2);
+            data.remove(field_1);
+            data.remove(field_2);
+            data.put(mergedField, v_1 + v_2);
+        }
+    }
+
     public static void sort(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> result) {
     
     }
