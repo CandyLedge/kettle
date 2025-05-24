@@ -3,10 +3,6 @@ package RunTask.pojo.OPS;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 public class Middle {
     // 这里封装了中间流程的操作 例如：过滤，数据处理···
@@ -42,6 +38,23 @@ public class Middle {
             stepToData.get(step).add(row);
         }
         return stepToData;
+    }
+    
+    public static void fieldMerge(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> results) {
+        String[] split = cmd.split(" ");
+        if (split.length != 4) {
+            throw new RuntimeException("字段合并的步骤出错！原因：privateField 字符串 传入错误！");
+        }
+        String field_1 = split[0];
+        String field_2 = split[1];
+        String mergedField = split[2];
+        for (HashMap<String, String> data : results) {
+            String v_1 = data.get(field_1);
+            String v_2 = data.get(field_2);
+            data.remove(field_1);
+            data.remove(field_2);
+            data.put(mergedField, v_1 + v_2);
+        }
     }
     
     public static void sort(String cmd, HashMap<String, Step> indexToStepMap, List<HashMap<String, String>> result) {
